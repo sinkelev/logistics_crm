@@ -1,0 +1,53 @@
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    background-color: #f5f6fa;
+    color: #2d3748;
+}
+.topbar {
+    background: #1f2937;
+    color: #f9fafb;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 32px;
+    align-items: center;
+}
+.topbar nav a {
+    color: #f9fafb;
+    margin-left: 20px;
+    text-decoration: none;
+}
+.auth-card, .form-page, .dashboard {
+    max-width: 900px;
+    margin: 40px auto;
+    background: white;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+}
+.cards {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.card {
+    border-radius: 14px;
+    background: #f1f5f9;
+    padding: 24px;
+}
+.button {
+    display: inline-block;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+}
+form button {
+    background: #1d4ed8;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}

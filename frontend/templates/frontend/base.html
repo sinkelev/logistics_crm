@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}CRM ЕвроТрансРегион{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
+</head>
+<body>
+<header class="topbar">
+    <div class="brand">ЕвроТрансРегион CRM</div>
+    {% if user.is_authenticated %}
+        <nav>
+            <a href="{% url 'frontend:dashboard' %}">Дашборд</a>
+            <a href="{% url 'frontend:route_create' %}">Новый рейс</a>
+            <a href="{% url 'frontend:driver_create' %}">Новый водитель</a>
+            <a href="{% url 'logout' %}">Выход</a>
+        </nav>
+    {% endif %}
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    <small>© {% now "Y" %} ЕвроТрансРегион</small>
+</footer>
+</body>
+</html>

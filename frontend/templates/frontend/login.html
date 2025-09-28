@@ -1,0 +1,20 @@
+{% extends "frontend/base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<section class="auth-card">
+    <h1>Вход в систему</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="form-row">
+            <label>Логин</label>
+            {{ form.username }}
+        </div>
+        <div class="form-row">
+            <label>Пароль</label>
+            {{ form.password }}
+        </div>
+        <button type="submit">Войти</button>
+    </form>
+</section>
+{% endblock %}
