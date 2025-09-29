@@ -1,45 +1,66 @@
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
-
-class Cargo(models.Model):
+class Order(models.Model):
     VAT_STATUS = [
         ("with_vat", "С НДС"),
         ("without_vat", "Без НДС"),
     ]
 
-    code = models.CharField(max_length=30, unique=True)
-    description = models.TextField()
-    weight_kg = models.DecimalField(max_digits=10, decimal_places=2)
+    code = models.CharField(max_length=30, unique=True, verbose_name="Код заказа") # Добавлено verbose_name
+    description = models.TextField(verbose_name="Описание")
+    weight_kg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Вес (кг)")
     volume_m3 = models.DecimalField(
         max_digits=10,
         decimal_places=3,
         null=True,
         blank=True,
+        verbose_name="Объем (м³)",
     )
-    shipper = models.CharField(max_length=255)
-    consignee = models.CharField(max_length=255)
+    customer = models.CharField(max_length=255, verbose_name="Заказчик")
+    consignee = models.CharField(max_length=255, verbose_name="Получатель")
     vat_status = models.CharField(
         max_length=15,
         choices=VAT_STATUS,
         default="with_vat",
+        verbose_name="Статус НДС",
     )
-    is_return_trip = models.BooleanField(default=False)
+    is_return_trip = models.BooleanField(default=False, verbose_name="Обратный рейс")
+    invoice_number = models.CharField(max_length=50, blank=True, verbose_name="Номер счета")
+    act_number = models.CharField(max_length=50, blank=True, verbose_name="Номер акта")
+    invoice_act_number = models.CharField(max_length=50, blank=True, verbose_name="Номер счет-фактуры")
+    driver = models.ForeignKey(  # Водитель (если выбран)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"role": "driver"},
+        verbose_name="Водитель",
+    )
+    document_driver = models.CharField(max_length=255, blank=True, verbose_name="Водитель по документам")
+    route_from = models.CharField(max_length=255, verbose_name="Маршрут От")
+    route_to = models.CharField(max_length=255, verbose_name="Маршрут До")
 
     def __str__(self):
         return f"{self.code}: {self.description[:30]}"
 
+    class Meta:
+        verbose_name = "Заявка"
+        verbose_name_plural = "Заявки"
 
+# Ваша модель WarehouseEntry также должна быть здесь
 class WarehouseEntry(models.Model):
     cargo = models.ForeignKey(
-        Cargo,
+        Order,
         on_delete=models.CASCADE,
         related_name="warehouse_entries",
+        verbose_name="Заявка", # Добавлено verbose_name
     )
-    arrived_at = models.DateTimeField()
-    released_at = models.DateTimeField(null=True, blank=True)
-    location = models.CharField(max_length=100)
-    notes = models.TextField(blank=True)
+    arrived_at = models.DateTimeField(verbose_name="Дата прибытия")
+    released_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата выдачи")
+    location = models.CharField(max_length=100, verbose_name="Местоположение")
+    notes = models.TextField(blank=True, verbose_name="Заметки")
 
     @property
     def storage_time_hours(self):
@@ -48,4 +69,8 @@ class WarehouseEntry(models.Model):
 
     def __str__(self):
         status = "на складе" if not self.released_at else "выдан"
-        return f"{self.cargo.code} — {status}"
+        return f"Складская запись для {self.cargo.code} — {status}"
+
+    class Meta:
+        verbose_name = "Складская запись"
+        verbose_name_plural = "Складские записи"

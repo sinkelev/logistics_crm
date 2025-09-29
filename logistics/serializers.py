@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .models import Route, RouteCargo
-from warehouse.models import Cargo
-from warehouse.serializers import CargoSerializer
+from warehouse.models import Order
+from warehouse.serializers import OrderSerializer
 
 
 class RouteCargoSerializer(serializers.ModelSerializer):
-    cargo = CargoSerializer(read_only=True)
+    cargo = OrderSerializer(read_only=True)
 
     class Meta:
         model = RouteCargo
@@ -24,7 +24,7 @@ class RouteSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     cargoes = serializers.PrimaryKeyRelatedField(
-        queryset=Cargo.objects.all(),
+        queryset=Order.objects.all(),
         many=True,
         write_only=True,
         required=False,

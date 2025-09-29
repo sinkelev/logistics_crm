@@ -1,24 +1,35 @@
 from rest_framework import serializers
-from .models import Cargo
+from .models import Order
 
-
-class CargoSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     vat_status_display = serializers.CharField(
         source="get_vat_status_display",
         read_only=True,
     )
+    driver_name = serializers.CharField(
+        source="driver.get_full_name",
+        read_only=True,
+    )
 
     class Meta:
-        model = Cargo
+        model = Order
         fields = [
             "id",
             "code",
             "description",
             "weight_kg",
             "volume_m3",
-            "shipper",
+            "customer",
             "consignee",
             "vat_status",
             "vat_status_display",
             "is_return_trip",
+            "invoice_number",
+            "act_number",
+            "invoice_act_number",
+            "driver",
+            "driver_name",
+            "document_driver",
+            "route_from",      # Маршрут От
+            "route_to",        # Маршрут До
         ]

@@ -39,7 +39,7 @@ class Route(models.Model):
     notes = models.TextField(blank=True)
 
     cargoes = models.ManyToManyField(
-        "warehouse.Cargo",
+        "warehouse.Order",
         through="RouteCargo",
     )
 
@@ -53,7 +53,7 @@ class RouteCargo(models.Model):
         on_delete=models.CASCADE,
     )
     cargo = models.ForeignKey(
-        "warehouse.Cargo",
+        "warehouse.Order",
         on_delete=models.CASCADE,
     )
     position = models.PositiveIntegerField(default=1)

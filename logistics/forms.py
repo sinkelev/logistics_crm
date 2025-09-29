@@ -1,13 +1,13 @@
 from django import forms
 from .models import Route
-from warehouse.models import Cargo
+from warehouse.models import Order
 
 class RouteForm(forms.ModelForm):
     cargoes = forms.ModelMultipleChoiceField(
-        queryset=Cargo.objects.all(),
+        queryset=Order.objects.all(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
-        label="Грузы для маршрута",
+        label="Заявки для маршрута",
     )
 
     class Meta:

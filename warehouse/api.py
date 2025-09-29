@@ -1,7 +1,7 @@
 from rest_framework import viewsets
-from .models import Cargo
-from .serializers import CargoSerializer
+from .models import Order
+from .serializers import OrderSerializer
 
-class CargoViewSet(viewsets.ModelViewSet):
-    queryset = Cargo.objects.all()
-    serializer_class = CargoSerializer
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer

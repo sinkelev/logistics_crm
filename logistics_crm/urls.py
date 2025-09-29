@@ -19,12 +19,12 @@ from django.urls import include, path
 from django.contrib.auth import views as auth_views
 from rest_framework.routers import DefaultRouter
 from logistics.api import RouteViewSet
-from warehouse.api import CargoViewSet
+from warehouse.api import OrderViewSet
 from finance.api import ExpenseViewSet
 
 router = DefaultRouter()
 router.register(r"routes", RouteViewSet)
-router.register(r"cargoes", CargoViewSet)
+router.register(r"cargoes", OrderViewSet)
 router.register(r"expenses", ExpenseViewSet)
 
 urlpatterns = [
