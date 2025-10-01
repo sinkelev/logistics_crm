@@ -1,0 +1,44 @@
+{% extends "frontend/base.html" %}
+{% block title %}Рейс {{ route.route_number }}{% endblock %}
+{% block content %}
+<section class="dashboard">
+    <h1>Рейс {{ route.route_number }}</h1>
+
+    <p>
+        <a class="button" href="{% url 'frontend:route_edit' route.pk %}">Редактировать</a>
+        <a class="button" href="{% url 'frontend:routes_list' %}">К списку</a>
+    </p>
+
+    <div class="detail-grid">
+        <div>
+            <h2>Основная информация</h2>
+            <dl>
+                <dt>Автомобиль</dt><dd>{{ route.vehicle|default:"—" }}</dd>
+                <dt>Водитель</dt><dd>{{ route.driver|default:"—" }}</dd>
+                <dt>Планируемое начало</dt><dd>{{ route.planned_start|date:"d.m.Y H:i" }}</dd>
+                <dt>Фактическое начало</dt><dd>{{ route.actual_start|date:"d.m.Y H:i"|default:"—" }}</dd>
+                <dt>Статус</dt><dd>
+                    {% if route.actual_end %}
+                        Завершен ({{ route.actual_end|date:"d.m.Y H:i" }})
+                    {% elif route.actual_start %}
+                        В пути
+                    {% else %}
+                        Планируется
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        
+        <div>
+            <h2>Грузы</h2>
+            <ul>
+                {% for cargo in route.routecargo_set.all %}
+                    <li>{{ cargo.cargo.code }} - {{ cargo.cargo.description|truncatechars:30 }}</li>
+                {% empty %}
+                    <li>Грузов нет</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+{% endblock %}

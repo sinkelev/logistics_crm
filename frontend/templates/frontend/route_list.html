@@ -1,0 +1,54 @@
+{% extends "frontend/base.html" %}
+{% block title %}Рейсы{% endblock %}
+{% block content %}
+<section class="dashboard">
+    <h1>Рейсы</h1>
+    
+    <p>
+        <a class="button" href="{% url 'frontend:add_route' %}">Добавить рейс</a>
+    </p>
+
+    {% if routes %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Номер</th>
+                    <th>Транспорт</th>
+                    <th>Водитель</th>
+                    <th>Дата начала</th>
+                    <th>Статус</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for route in routes %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'frontend:route_detail' route.pk %}">
+                                {{ route.route_number }}
+                            </a>
+                        </td>
+                        <td>{{ route.vehicle|default:"—" }}</td>
+                        <td>{{ route.driver|default:"—" }}</td>
+                        <td>{{ route.planned_start|date:"d.m.Y H:i" }}</td>
+                        <td>
+                            {% if route.actual_end %}
+                                Завершен
+                            {% elif route.actual_start %}
+                                В пути
+                            {% else %}
+                                Планируется
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'frontend:route_edit' route.pk %}">Редактировать</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Рейсов пока нет</p>
+    {% endif %}
+</section>
+{% endblock %}

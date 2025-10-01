@@ -81,3 +81,29 @@ class OrderUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse("frontend:order_detail", kwargs={"pk": self.object.pk})
+
+
+class RouteListView(LoginRequiredMixin, ListView):
+    model = Route
+    template_name = "frontend/route_list.html"
+    context_object_name = "routes"
+    paginate_by = 20
+    ordering = "-planned_start"
+
+
+class RouteDetailView(LoginRequiredMixin, DetailView):
+    model = Route
+    template_name = "frontend/route_detail.html"
+    context_object_name = "route"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related('vehicle', 'driver')
+
+
+class RouteUpdateView(LoginRequiredMixin, UpdateView):
+    model = Route
+    form_class = RouteForm
+    template_name = "frontend/route_form.html"
+
+    def get_success_url(self):
+        return reverse("frontend:route_detail", kwargs={"pk": self.object.pk})

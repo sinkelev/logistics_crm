@@ -9,48 +9,56 @@
     </p>
 
     {% if orders %}
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Код</th>
-                    <th>Описание</th>
-                    <th>Маршрут</th>
-                    <th>Водитель</th>
-                    <th>Статус НДС</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
+        <div class="table-container">
+            <table class="table">
+                <thead>
                     <tr>
-                        <td>
-                            <a href="{% url 'frontend:order_detail' order.pk %}">
-                                {{ order.code }}
-                            </a>
-                        </td>
-                        <td>{{ order.description|truncatechars:60 }}</td>
-                        <td>{{ order.route_from }} → {{ order.route_to }}</td>
-                        <td>{{ order.driver|default:"—" }}</td>
-                        <td>{{ order.get_vat_status_display }}</td>
-                        <td>
-                            <a href="{% url 'frontend:order_edit' order.pk %}">Редактировать</a>
-                        </td>
+                        <th>Код</th>
+                        <th>Заказчик</th>
+                        <th>Маршрут</th>
+                        <th>Водитель</th>
+                        <th>Док. водитель</th>
+                        <th>Ставка</th>
+                        <th>Счёт</th>
+                        <th>Акт</th>
+                        <th>Счет-фактура</th>
+                        <th>Статус НДС</th>
+                        <th></th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        {% if is_paginated %}
-            <div class="pagination">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}">« Назад</a>
-                {% endif %}
-                <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">Вперёд »</a>
-                {% endif %}
-            </div>
-        {% endif %}
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'frontend:order_detail' order.pk %}">
+                                    {{ order.code }}
+                                </a>
+                            </td>
+                            <td>{{ order.customer|truncatechars:20 }}</td>
+                            <td>{{ order.route_from }} → {{ order.route_to }}</td>
+                            <td>{{ order.driver|default:"—" }}</td>
+                            <td>{{ order.document_driver|default:"—" }}</td>
+                            <td>
+                                {% if order.rate %}
+                                    {{ order.rate }} ₽
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td>{{ order.invoice_number|default:"—" }}</td>
+                            <td>{{ order.act_number|default:"—" }}</td>
+                            <td>{{ order.invoice_act_number|default:"—" }}</td>
+                            <td>{{ order.get_vat_status_display }}</td>
+                            <td>
+                                <a href="{% url 'frontend:order_edit' order.pk %}" class="link-edit">
+                                    ✏️
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% else %}
         <p>Заявок пока нет. Самое время добавить первую!</p>
     {% endif %}

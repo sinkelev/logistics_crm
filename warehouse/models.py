@@ -58,6 +58,63 @@ class Order(models.Model):
     )
     route_from = models.CharField(max_length=255, verbose_name="Маршрут От")
     route_to = models.CharField(max_length=255, verbose_name="Маршрут До")
+    date_order = models.DateField(
+        verbose_name="Дата заявки",
+        default=timezone.now
+    )
+    date_invoice = models.DateField(
+        verbose_name="Дата счёта",
+        blank=True,
+        null=True
+    )
+    date_act = models.DateField(
+        verbose_name="Дата акта",
+        blank=True,
+        null=True
+    )
+    date_invoice_act = models.DateField(
+        verbose_name="Дата счет-фактуры",
+        blank=True,
+        null=True
+    )
+    RPO_STATUS_CHOICES = [
+        ('not_sent', 'Не отправлено'),
+        ('created', 'Создано'),
+        ('sent', 'Отправлено'),
+        ('delivered', 'Доставлено'),
+        ('problem', 'Проблема'),
+    ]
+    rpo_number = models.CharField(
+        max_length=50,
+        blank=True,
+        verbose_name="Номер РПО"
+    )
+    rpo_status = models.CharField(
+        max_length=20,
+        choices=RPO_STATUS_CHOICES,
+        default='not_sent',
+        verbose_name="Статус РПО"
+    )
+
+    def save(self, *args, **kwargs):
+        # Автоматическая установка даты счёта
+        if not self.date_invoice and self.date_order:
+            self.date_invoice = self.date_order
+
+        # Автоматическая установка даты счет-фактуры
+        if self.date_act and not self.date_invoice_act:
+            self.date_invoice_act = self.date_act
+
+        # Автоматически устанавливаем документального водителя только при создании
+        if not self.pk and self.driver:
+            self.document_driver = self.driver
+
+        # Для существующих записей запрещаем автоматическое изменение
+        elif self.pk:
+            original = Order.objects.get(pk=self.pk)
+            self.document_driver = original.document_driver
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.code}: {self.description[:30]}"

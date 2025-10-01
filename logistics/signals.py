@@ -11,8 +11,12 @@ def assign_driver_on_routecargo_save(sender, instance, **kwargs):
     """
     При привязке заявки к маршруту синхронизируем водителя.
     """
-    driver_id = instance.route.driver_id
-    Order.objects.filter(pk=instance.cargo_id).update(driver_id=driver_id)
+    cargo = instance.cargo
+    new_driver = instance.route.driver
+
+    if cargo.driver != new_driver:
+        cargo.driver = new_driver
+        cargo.save(update_fields=['driver'])
 
 
 @receiver(post_delete, sender=RouteCargo)
@@ -30,3 +34,9 @@ def assign_driver_on_route_save(sender, instance, **kwargs):
     При сохранении маршрута (создание/изменение) синхронизируем водителя со всеми его заявками.
     """
     Order.objects.filter(routecargo__route=instance).update(driver_id=instance.driver_id)
+
+@receiver(post_save, sender=Route)
+def update_driver_on_route_save(sender, instance, **kwargs):
+    """Обновляет водителя во всех заявках маршрута"""
+    if instance.driver:
+        Order.objects.filter(routecargo__route=instance).update(driver=instance.driver)

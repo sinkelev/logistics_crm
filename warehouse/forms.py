@@ -31,6 +31,12 @@ class OrderForm(forms.ModelForm):
             'act_number',
             'invoice_act_number',
             'document_driver',
+            'date_order',
+            'date_invoice',
+            'date_act',
+            'date_invoice_act',
+            'rpo_number',
+            'rpo_status',
         ]
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Уникальный складской номер'}),
@@ -52,4 +58,8 @@ class OrderForm(forms.ModelForm):
             'act_number': forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Номер акта выполненных работ'}),
             'invoice_act_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер счет-фактуры'}),
+            'date_order': forms.DateInput(attrs={'type': 'date'}),
+            'date_invoice': forms.DateInput(attrs={'type': 'date'}),
+            'date_act': forms.DateInput(attrs={'type': 'date'}),
+            'date_invoice_act': forms.DateInput(attrs={'type': 'date'}),
         }

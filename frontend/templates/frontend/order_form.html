@@ -1,10 +1,18 @@
 {% extends "frontend/base.html" %}
 
-{% block title %}Новая заявка{% endblock %}
+{% block title %}
+  {% if object.pk %}Редактирование заявки{% else %}Добавление заявки{% endif %}
+{% endblock %}
 
 {% block content %}
 <section class="form-page">
-  <h1>Добавление заявки</h1>
+  <h1>
+    {% if object.pk %}
+      Редактирование заявки {{ object.code }}
+    {% else %}
+      Добавление заявки
+    {% endif %}
+  </h1>
 
   <form method="post">
     {% csrf_token %}
@@ -19,7 +27,12 @@
       </div>
     {% endfor %}
 
-    <button type="submit">Сохранить</button>
+    <div class="form-actions">
+      <button type="submit" class="button">Сохранить</button>
+      <a href="{{ request.META.HTTP_REFERER|default:'{% url "frontend:orders_list" %}' }}" class="button cancel">
+        Назад
+      </a>
+    </div>
   </form>
 </section>
 {% endblock %}
