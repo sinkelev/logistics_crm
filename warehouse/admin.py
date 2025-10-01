@@ -4,13 +4,12 @@ from .models import Order, WarehouseEntry
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = (
-        'code', 'customer', 'consignee', 'weight_kg', 'volume_m3',
+        'code', 'order_number', 'customer', 'weight_kg', 'places', 'rate', # Добавлены places и rate
         'vat_status', 'is_return_trip', 'driver', 'document_driver', 'route_from', 'route_to'
     )
-    list_filter = ('vat_status', 'is_return_trip', 'driver')
-    search_fields = ('code', 'customer', 'consignee', 'description', 'document_driver')
-    # Добавлено 'driver' в raw_id_fields, чтобы упростить выбор водителя из большого списка
-    raw_id_fields = ('driver',)
+    list_filter = ('vat_status', 'is_return_trip', 'driver', 'document_driver')
+    search_fields = ('code', 'customer', 'description', 'document_driver__username')
+    raw_id_fields = ('driver', 'document_driver',)
 
 @admin.register(WarehouseEntry)
 class WarehouseEntryAdmin(admin.ModelAdmin):

@@ -1,37 +1,25 @@
 {% extends "frontend/base.html" %}
-{% block title %}Дашборд{% endblock %}
-{% block content %}
-<section class="dashboard">
-    <h1>Добро пожаловать, {{ user.get_full_name|default:user.username }}!</h1>
 
-    <div class="cards">
-        <article class="card">
-            <h2>Активные водители</h2>
-            <p class="metric">{{ drivers_count }}</p>
-        </article>
-        <article class="card">
-            <h2>Последние рейсы</h2>
-            <ul>
-                {% for route in recent_routes %}
-                    <li>
-                        <strong>{{ route.route_number }}</strong>
-                        — {{ route.vehicle }} ({{ route.driver }})
-                        <br>
-                        План: {{ route.planned_start|date:"d.m.Y H:i" }}
-                    </li>
-                {% empty %}
-                    <li>Рейсов пока нет.</li>
-                {% endfor %}
-            </ul>
-        </article>
-        <article class="card">
-            <h2>Быстрые действия</h2>
-            <p>
-                <a class="button" href="{% url 'frontend:add_route' %}">Завести рейс</a><br>
-                <a class="button" href="{% url 'frontend:add_driver' %}">Добавить водителя</a><br>
-                <a class="button" href="{% url 'frontend:add_order' %}">Добавить заявку</a> {# НОВАЯ ССЫЛКА #}
-            </p>
-        </article>
-    </div>
+{% block title %}Новая заявка{% endblock %}
+
+{% block content %}
+<section class="form-page">
+  <h1>Добавление заявки</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+      <div class="form-row">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+
+    <button type="submit">Сохранить</button>
+  </form>
 </section>
 {% endblock %}

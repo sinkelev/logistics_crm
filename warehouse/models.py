@@ -8,8 +8,10 @@ class Order(models.Model):
         ("without_vat", "Без НДС"),
     ]
 
-    code = models.CharField(max_length=30, unique=True, verbose_name="Код заказа") # Добавлено verbose_name
+    code = models.CharField(max_length=30, unique=True, verbose_name="Складской номер")
+    order_number=models.CharField(max_length=30, blank=True, verbose_name="Номер заявки")
     description = models.TextField(verbose_name="Описание")
+    places = models.PositiveIntegerField(default=1, verbose_name="Места (шт)")
     weight_kg = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Вес (кг)")
     volume_m3 = models.DecimalField(
         max_digits=10,
@@ -18,8 +20,14 @@ class Order(models.Model):
         blank=True,
         verbose_name="Объем (м³)",
     )
+    rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Ставка"
+    )
     customer = models.CharField(max_length=255, verbose_name="Заказчик")
-    consignee = models.CharField(max_length=255, verbose_name="Получатель")
     vat_status = models.CharField(
         max_length=15,
         choices=VAT_STATUS,
@@ -30,15 +38,24 @@ class Order(models.Model):
     invoice_number = models.CharField(max_length=50, blank=True, verbose_name="Номер счета")
     act_number = models.CharField(max_length=50, blank=True, verbose_name="Номер акта")
     invoice_act_number = models.CharField(max_length=50, blank=True, verbose_name="Номер счет-фактуры")
-    driver = models.ForeignKey(  # Водитель (если выбран)
+    driver = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         limit_choices_to={"role": "driver"},
         verbose_name="Водитель",
+        related_name="assigned_orders"
     )
-    document_driver = models.CharField(max_length=255, blank=True, verbose_name="Водитель по документам")
+    document_driver = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={"role": "driver"},
+        verbose_name="Водитель по документам",
+        related_name="documented_orders"
+    )
     route_from = models.CharField(max_length=255, verbose_name="Маршрут От")
     route_to = models.CharField(max_length=255, verbose_name="Маршрут До")
 
@@ -49,13 +66,13 @@ class Order(models.Model):
         verbose_name = "Заявка"
         verbose_name_plural = "Заявки"
 
-# Ваша модель WarehouseEntry также должна быть здесь
+
 class WarehouseEntry(models.Model):
     cargo = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
         related_name="warehouse_entries",
-        verbose_name="Заявка", # Добавлено verbose_name
+        verbose_name="Заявка",
     )
     arrived_at = models.DateTimeField(verbose_name="Дата прибытия")
     released_at = models.DateTimeField(null=True, blank=True, verbose_name="Дата выдачи")

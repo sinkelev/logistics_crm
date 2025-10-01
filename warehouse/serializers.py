@@ -16,11 +16,13 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "code",
+            "order_number",
             "description",
+            "places",
             "weight_kg",
             "volume_m3",
+            "rate",
             "customer",
-            "consignee",
             "vat_status",
             "vat_status_display",
             "is_return_trip",
@@ -30,6 +32,6 @@ class OrderSerializer(serializers.ModelSerializer):
             "driver",
             "driver_name",
             "document_driver",
-            "route_from",      # Маршрут От
-            "route_to",        # Маршрут До
+            "route_from",
+            "route_to",
         ]
