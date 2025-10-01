@@ -12,6 +12,7 @@
     {% if user.is_authenticated %}
         <nav>
             <a href="{% url 'frontend:dashboard' %}">Дашборд</a>
+            <a href="{% url 'frontend:orders_list' %}">Заявки</a>
             <a href="{% url 'frontend:add_route' %}">Новый рейс</a>
             <a href="{% url 'frontend:add_driver' %}">Новый водитель</a>
             <a href="{% url 'logout' %}">Выход</a>

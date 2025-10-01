@@ -1,13 +1,19 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
-from django.views.generic import TemplateView, CreateView
+from django.urls import reverse_lazy, reverse
+from django.views.generic import (
+    TemplateView,
+    CreateView,
+    ListView,
+    DetailView,
+    UpdateView,
+)
 
 from logistics.models import Route
 from logistics.forms import RouteForm
 from accounts.models import User
 from accounts.forms import DriverForm
-from warehouse.models import Order # <-- Добавлено
-from warehouse.forms import OrderForm # <-- Добавлено
+from warehouse.models import Order
+from warehouse.forms import OrderForm
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "frontend/dashboard.html"
@@ -33,9 +39,45 @@ class DriverCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("frontend:dashboard")
 
 
-# НОВОЕ ПРЕДСТАВЛЕНИЕ ДЛЯ ЗАЯВКИ
 class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order # Указываем модель, для которой создаем объект
     template_name = "frontend/order_form.html"
     form_class = OrderForm # Используем нашу OrderForm
     success_url = reverse_lazy("frontend:dashboard") # Перенаправляем на дашборд после сохранения
+
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = "frontend/order_list.html"
+    context_object_name = "orders"
+    paginate_by = 20
+    ordering = "-id"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("driver", "document_driver")
+        )
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = "frontend/order_detail.html"
+    context_object_name = "order"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("driver", "document_driver")
+        )
+
+
+class OrderUpdateView(LoginRequiredMixin, UpdateView):
+    model = Order
+    template_name = "frontend/order_form.html"
+    form_class = OrderForm
+
+    def get_success_url(self):
+        return reverse("frontend:order_detail", kwargs={"pk": self.object.pk})

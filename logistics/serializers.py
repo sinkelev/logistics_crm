@@ -84,3 +84,15 @@ class RouteSerializer(serializers.ModelSerializer):
                 cargo=cargo,
                 position=index,
             )
+
+    def _replace_cargo_links(self, route, cargoes):
+        cargo_list = list(cargoes)
+        RouteCargo.objects.filter(route=route).delete()
+        for index, cargo in enumerate(cargo_list, start=1):
+            RouteCargo.objects.create(
+                route=route,
+                cargo=cargo,
+                position=index,
+            )
+        if route.driver and cargo_list:
+            Order.objects.filter(pk__in=[cargo.pk for cargo in cargo_list]).update(driver=route.driver)

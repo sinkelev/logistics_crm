@@ -1,0 +1,58 @@
+{% extends "frontend/base.html" %}
+{% block title %}Заявки{% endblock %}
+{% block content %}
+<section class="dashboard">
+    <h1>Заявки</h1>
+
+    <p>
+        <a class="button" href="{% url 'frontend:add_order' %}">Добавить заявку</a>
+    </p>
+
+    {% if orders %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Код</th>
+                    <th>Описание</th>
+                    <th>Маршрут</th>
+                    <th>Водитель</th>
+                    <th>Статус НДС</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'frontend:order_detail' order.pk %}">
+                                {{ order.code }}
+                            </a>
+                        </td>
+                        <td>{{ order.description|truncatechars:60 }}</td>
+                        <td>{{ order.route_from }} → {{ order.route_to }}</td>
+                        <td>{{ order.driver|default:"—" }}</td>
+                        <td>{{ order.get_vat_status_display }}</td>
+                        <td>
+                            <a href="{% url 'frontend:order_edit' order.pk %}">Редактировать</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if is_paginated %}
+            <div class="pagination">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}">« Назад</a>
+                {% endif %}
+                <span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Вперёд »</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <p>Заявок пока нет. Самое время добавить первую!</p>
+    {% endif %}
+</section>
+{% endblock %}

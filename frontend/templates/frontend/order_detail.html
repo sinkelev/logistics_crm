@@ -1,0 +1,42 @@
+{% extends "frontend/base.html" %}
+{% block title %}Заявка {{ order.code }}{% endblock %}
+{% block content %}
+<section class="dashboard">
+    <h1>Заявка {{ order.code }}</h1>
+
+    <p>
+        <a class="button" href="{% url 'frontend:order_edit' order.pk %}">Редактировать</a>
+        <a class="button" href="{% url 'frontend:orders_list' %}">К списку</a>
+    </p>
+
+    <div class="detail-grid">
+        <div>
+            <h2>Основная информация</h2>
+            <dl>
+                <dt>Описание</dt><dd>{{ order.description }}</dd>
+                <dt>Маршрут</dt><dd>{{ order.route_from }} → {{ order.route_to }}</dd>
+                <dt>Места</dt><dd>{{ order.places }}</dd>
+                <dt>Вес</dt><dd>{{ order.weight_kg }} кг</dd>
+                <dt>Объём</dt><dd>{{ order.volume_m3|default:"—" }} м³</dd>
+            </dl>
+        </div>
+        <div>
+            <h2>Финансы</h2>
+            <dl>
+                <dt>Ставка</dt><dd>{{ order.rate|default:"—" }}</dd>
+                <dt>Статус НДС</dt><dd>{{ order.get_vat_status_display }}</dd>
+                <dt>Счёт</dt><dd>{{ order.invoice_number|default:"—" }}</dd>
+                <dt>Акт</dt><dd>{{ order.act_number|default:"—" }}</dd>
+                <dt>Счёт-фактура</dt><dd>{{ order.invoice_act_number|default:"—" }}</dd>
+            </dl>
+        </div>
+        <div>
+            <h2>Водители</h2>
+            <dl>
+                <dt>Основной водитель</dt><dd>{{ order.driver|default:"—" }}</dd>
+                <dt>Водитель по документам</dt><dd>{{ order.document_driver|default:"—" }}</dd>
+            </dl>
+        </div>
+    </div>
+</section>
+{% endblock %}
