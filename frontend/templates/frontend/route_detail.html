@@ -15,7 +15,7 @@
             <dl>
                 <dt>Автомобиль</dt><dd>{{ route.vehicle|default:"—" }}</dd>
                 <dt>Водитель</dt><dd>{{ route.driver|default:"—" }}</dd>
-                <dt>Планируемое начало</dt><dd>{{ route.planned_start|date:"d.m.Y H:i" }}</dd>
+                <dt>Дата загрузки</dt><dd>{{ route.date_start|date:"d.m.Y H:i" }}</dd>
                 <dt>Фактическое начало</dt><dd>{{ route.actual_start|date:"d.m.Y H:i"|default:"—" }}</dd>
                 <dt>Статус</dt><dd>
                     {% if route.actual_end %}

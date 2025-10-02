@@ -20,5 +20,5 @@ class Command(BaseCommand):
                 "route_to": "Санкт-Петербург"
             }
         )
-        Route.objects.get_or_create(route_number="R-2024-0001", planned_start=timezone.now())
+        Route.objects.get_or_create(route_number="R-2024-0001", date_start=timezone.now())
         self.stdout.write(self.style.SUCCESS("Demo data installed"))

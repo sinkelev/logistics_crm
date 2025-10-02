@@ -51,7 +51,7 @@ class RouteSerializer(serializers.ModelSerializer):
             "vehicle_label",
             "driver",
             "driver_label",
-            "planned_start",
+            "date_start",
             "planned_end",
             "actual_start",
             "actual_end",

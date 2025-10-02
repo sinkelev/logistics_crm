@@ -30,7 +30,7 @@
                         </td>
                         <td>{{ route.vehicle|default:"—" }}</td>
                         <td>{{ route.driver|default:"—" }}</td>
-                        <td>{{ route.planned_start|date:"d.m.Y H:i" }}</td>
+                        <td>{{ route.date_start|date:"d.m.Y H:i" }}</td>
                         <td>
                             {% if route.actual_end %}
                                 Завершен

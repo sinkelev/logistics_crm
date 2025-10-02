@@ -100,3 +100,8 @@ form button {
         padding: 10px;
     }
 }
+
+.field-changed {
+    outline: 2px dashed #f59e0b;
+    background-color: #fffaf0;
+}

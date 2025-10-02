@@ -17,7 +17,7 @@
                         <strong>{{ route.route_number }}</strong>
                         — {{ route.vehicle }} ({{ route.driver }})
                         <br>
-                        План: {{ route.planned_start|date:"d.m.Y H:i" }}
+                        План: {{ route.date_start|date:"d.m.Y H:i" }}
                     </li>
                 {% empty %}
                     <li>Рейсов пока нет.</li>

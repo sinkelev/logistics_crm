@@ -17,13 +17,13 @@ class RouteForm(forms.ModelForm):
             "vehicle",
             "driver",
             "legal_entity",
-            "planned_start",
+            "date_start",
             "planned_end",
             "cargoes",
             "notes",
         ]
         widgets = {
-            "planned_start": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "date_start": forms.DateTimeInput(attrs={"type": "datetime-local"}),
             "planned_end": forms.DateTimeInput(attrs={"type": "datetime-local"}),
         }
         labels = {
@@ -31,7 +31,7 @@ class RouteForm(forms.ModelForm):
             "vehicle": "Автомобиль",
             "driver": "Водитель",
             "legal_entity": "Юрлицо",
-            "planned_start": "Плановое начало",
+            "date_start": "Дата загрузки",
             "planned_end": "Плановое завершение",
             "notes": "Комментарий",
         }

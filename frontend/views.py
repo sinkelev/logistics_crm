@@ -20,7 +20,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["recent_routes"] = Route.objects.select_related("vehicle", "driver").order_by("-planned_start")[:5]
+        context["recent_routes"] = Route.objects.select_related("vehicle", "driver").order_by("-date_start")[:5]
         context["drivers_count"] = User.objects.filter(role="driver").count()
         # Можно добавить статистику по заявкам, если нужно
         # context["orders_count"] = Order.objects.count()
@@ -30,8 +30,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 class RouteCreateView(LoginRequiredMixin, CreateView):
     template_name = "frontend/route_form.html"
     form_class = RouteForm
-    success_url = reverse_lazy("frontend:dashboard")
 
+    def get_success_url(self):
+        return reverse("frontend:route_detail", kwargs={"pk": self.object.pk})
 
 class DriverCreateView(LoginRequiredMixin, CreateView):
     template_name = "frontend/driver_form.html"
@@ -43,7 +44,9 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
     model = Order # Указываем модель, для которой создаем объект
     template_name = "frontend/order_form.html"
     form_class = OrderForm # Используем нашу OrderForm
-    success_url = reverse_lazy("frontend:dashboard") # Перенаправляем на дашборд после сохранения
+
+    def get_success_url(self):
+        return reverse("frontend:order_detail", kwargs={"pk": self.object.pk})
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -88,7 +91,7 @@ class RouteListView(LoginRequiredMixin, ListView):
     template_name = "frontend/route_list.html"
     context_object_name = "routes"
     paginate_by = 20
-    ordering = "-planned_start"
+    ordering = "-date_start"
 
 
 class RouteDetailView(LoginRequiredMixin, DetailView):

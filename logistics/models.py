@@ -21,7 +21,7 @@ class Route(models.Model):
         null=True,
         limit_choices_to={"role": "driver"},
     )
-    planned_start = models.DateTimeField()
+    date_start = models.DateTimeField()
     planned_end = models.DateTimeField(null=True, blank=True)
     actual_start = models.DateTimeField(null=True, blank=True)
     actual_end = models.DateTimeField(null=True, blank=True)
