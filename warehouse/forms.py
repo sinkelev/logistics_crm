@@ -12,6 +12,14 @@ class OrderForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
+    def __init__(self, *args, **kwargs):
+        initial_invoice_number = kwargs.pop('initial_invoice_number', None)
+        super().__init__(*args, **kwargs)
+
+        # Если передано начальное значение, устанавливаем его для поля
+        if initial_invoice_number:
+            self.fields['invoice_number'].initial = initial_invoice_number
+
     class Meta:
         model = Order
         fields = [

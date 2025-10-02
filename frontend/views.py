@@ -1,3 +1,4 @@
+import re
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.views.generic import (
@@ -47,6 +48,50 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
 
     def get_success_url(self):
         return reverse("frontend:order_detail", kwargs={"pk": self.object.pk})
+
+    def get_next_invoice_number(self):
+        """
+        Находит последний номер счета и возвращает следующий по порядку.
+        """
+        # Ищем последнюю заявку с непустым номером счета, сортируя по ID
+        last_order_with_invoice = Order.objects.filter(
+            invoice_number__isnull=False
+        ).exclude(
+            invoice_number__exact=''
+        ).order_by('-id').first()
+
+        if not last_order_with_invoice:
+            return "1"  # Если счетов нет вообще, начинаем с "1"
+
+        last_invoice_number = last_order_with_invoice.invoice_number
+
+        # Используем регулярное выражение для поиска чисел в конце строки
+        match = re.search(r'(\d+)$', last_invoice_number)
+
+        if match:
+            # Нашли число в конце
+            number_part = match.group(1)
+            # Префикс - это все, что было до числа
+            prefix = last_invoice_number[:-len(number_part)]
+            # Увеличиваем число и соединяем с префиксом
+            next_number = int(number_part) + 1
+            return f"{prefix}{next_number}"
+        else:
+            # Числа в конце нет, возможно, номер - это просто число
+            try:
+                next_number = int(last_invoice_number) + 1
+                return str(next_number)
+            except (ValueError, TypeError):
+                # Не удалось преобразовать в число, возвращаем как есть с суффиксом
+                return f"{last_invoice_number}-1"
+
+    def get_form_kwargs(self):
+        """Передаем начальное значение для номера счета в форму."""
+        kwargs = super().get_form_kwargs()
+        # Этот метод вызывается только для GET-запросов (не при отправке формы)
+        if self.request.method == 'GET':
+            kwargs['initial_invoice_number'] = self.get_next_invoice_number()
+        return kwargs
 
 
 class OrderListView(LoginRequiredMixin, ListView):
