@@ -3,6 +3,8 @@ import json
 
 from urllib.parse import urlencode
 from vehicles.models import Vehicle
+from django.db import models
+from django.db.models.functions import Length, Right, Cast
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
@@ -115,11 +117,27 @@ class OrderCreateView(LoginRequiredMixin, CreateView):
                 return f"{last_invoice_number}-1"
 
     def get_form_kwargs(self):
-        """Передаем начальное значение для номера счета в форму."""
+        """
+        Передает начальные данные в форму, включая номер счета и данные из GET-запроса.
+        """
         kwargs = super().get_form_kwargs()
-        # Этот метод вызывается только для GET-запросов (не при отправке формы)
+
+        # Готовим словарь для начальных данных
+        initial_data = {}
+
+        # Если это GET-запрос, добавляем сгенерированный номер счета
         if self.request.method == 'GET':
-            kwargs['initial_invoice_number'] = self.get_next_invoice_number()
+            initial_data['invoice_number'] = self.get_next_invoice_number()
+
+        # Добавляем все данные из GET-параметров, если они есть
+        # self.request.GET - это QueryDict, который ведет как словарь
+        for field in self.form_class.base_fields:
+            if field in self.request.GET:
+                initial_data[field] = self.request.GET.get(field)
+
+        # Обновляем kwargs с начальными данными
+        kwargs['initial'] = initial_data
+
         return kwargs
 
 
@@ -199,12 +217,33 @@ class OrderCopyView(LoginRequiredMixin, View):
             'volume_m3': source_order.volume_m3,
             'rate': source_order.rate,
             'vat_status': source_order.vat_status,
-            #'notes': f"Скопировано из заявки {source_order.code}{source_order.notes or ''}".strip()
+            'notes': f"Скопировано из заявки {source_order.code}",
+            'document_driver': source_order.document_driver,
+            'document_vehicle': source_order.document_vehicle,
         }
 
+        all_codes = Order.objects.filter(
+            code__regex=r'^\d+[cс]$'
+        ).values_list('code', flat=True)
+
+        max_num = 0
+        for code_str in all_codes:
+            try:
+                num = int(code_str[:-1])
+                if num > max_num:
+                    max_num = num
+            except (ValueError, IndexError):
+                continue
+
+        new_code = f"{max_num + 1}c"
+
+        data_to_copy['code'] = new_code
+
         base_url = reverse('frontend:add_order')
-        cleaned_data = {k: v for k, v in data_to_copy.items() if v is not None}
-        query_string = urlencode(data_to_copy)
+        cleaned_data = {k: v for k, v in data_to_copy.items() if v is not None and v != ''}
+        query_string = urlencode(cleaned_data)
         redirect_url = f'{base_url}?{query_string}'
+
+        return HttpResponseRedirect(redirect_url)
 
         return HttpResponseRedirect(redirect_url)
