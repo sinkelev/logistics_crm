@@ -9,6 +9,7 @@ urlpatterns = [
     path("orders/new/", views.OrderCreateView.as_view(), name="add_order"),
     path("orders/<int:pk>/", views.OrderDetailView.as_view(), name="order_detail"),
     path("orders/<int:pk>/edit/", views.OrderUpdateView.as_view(), name="order_edit"),
+    path("orders/<int:pk>/copy/", views.OrderCopyView.as_view(), name="order_copy"),
     path("routes/new/", views.RouteCreateView.as_view(), name="add_route"),
     path("drivers/new/", views.DriverCreateView.as_view(), name="add_driver"),
     path("routes/", views.RouteListView.as_view(), name="routes_list"),

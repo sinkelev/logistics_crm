@@ -53,9 +53,12 @@
                             <td>{{ order.act_number|default:"—" }}</td>
                             <td>{{ order.invoice_act_number|default:"—" }}</td>
                             <td>{{ order.get_vat_status_display }}</td>
-                            <td>
-                                <a href="{% url 'frontend:order_edit' order.pk %}" class="link-edit">
+                            <td class="actions">
+                                <a href="{% url 'frontend:order_edit' order.pk %}" class="link-edit" title="Редактировать">
                                     ✏️
+                                </a>
+                                <a href="{% url 'frontend:order_copy' order.pk %}" class="link-copy" title="Копировать">
+                                    📋
                                 </a>
                             </td>
                         </tr>

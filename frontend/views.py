@@ -1,6 +1,13 @@
 import re
+import json
+
+from urllib.parse import urlencode
+from vehicles.models import Vehicle
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
+from django.views import View
 from django.views.generic import (
     TemplateView,
     CreateView,
@@ -27,8 +34,30 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         # context["orders_count"] = Order.objects.count()
         return context
 
+class RouteContextMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-class RouteCreateView(LoginRequiredMixin, CreateView):
+        # Готовим данные о водителях: { "id": "ФАМИЛИЯ", ... }
+        drivers = User.objects.filter(role="driver")
+        drivers_map = {
+            str(driver.id): driver.last_name.strip().upper()
+            for driver in drivers if driver.last_name
+        }
+
+        vehicles = Vehicle.objects.all()
+        vehicles_map = {
+            str(vehicle.id): ''.join(filter(str.isalnum, vehicle.plate_number)).upper()
+            for vehicle in vehicles
+        }
+
+        context['drivers_map_json'] = json.dumps(drivers_map)
+        context['vehicles_map_json'] = json.dumps(vehicles_map)
+
+        return context
+
+
+class RouteCreateView(LoginRequiredMixin, RouteContextMixin, CreateView):
     template_name = "frontend/route_form.html"
     form_class = RouteForm
 
@@ -148,10 +177,34 @@ class RouteDetailView(LoginRequiredMixin, DetailView):
         return super().get_queryset().select_related('vehicle', 'driver')
 
 
-class RouteUpdateView(LoginRequiredMixin, UpdateView):
+class RouteUpdateView(LoginRequiredMixin, RouteContextMixin, UpdateView):
     model = Route
     form_class = RouteForm
     template_name = "frontend/route_form.html"
 
     def get_success_url(self):
         return reverse("frontend:route_detail", kwargs={"pk": self.object.pk})
+
+class OrderCopyView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        source_order = get_object_or_404(Order, pk=self.kwargs['pk'])
+
+        data_to_copy = {
+            'description': source_order.description,
+            'customer': source_order.customer,
+            'route_from': source_order.route_from,
+            'route_to': source_order.route_to,
+            'places': source_order.places,
+            'weight_kg': source_order.weight_kg,
+            'volume_m3': source_order.volume_m3,
+            'rate': source_order.rate,
+            'vat_status': source_order.vat_status,
+            #'notes': f"Скопировано из заявки {source_order.code}{source_order.notes or ''}".strip()
+        }
+
+        base_url = reverse('frontend:add_order')
+        cleaned_data = {k: v for k, v in data_to_copy.items() if v is not None}
+        query_string = urlencode(data_to_copy)
+        redirect_url = f'{base_url}?{query_string}'
+
+        return HttpResponseRedirect(redirect_url)

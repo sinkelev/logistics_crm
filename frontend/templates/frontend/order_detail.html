@@ -4,10 +4,11 @@
 <section class="dashboard">
     <h1>Заявка {{ order.code }}</h1>
 
-    <p>
-        <a class="button" href="{% url 'frontend:order_edit' order.pk %}">Редактировать</a>
-        <a class="button" href="{% url 'frontend:orders_list' %}">К списку</a>
-    </p>
+    <div class="actions">
+        <a href="{% url 'frontend:order_copy' order.pk %}" class="button secondary">Копировать</a>
+        <a href="{% url 'frontend:order_edit' order.pk %}" class="button">Редактировать</a>
+        <a href="{% url 'frontend:orders_list' %}" class="button outline">К списку</a>
+    </div>
 
     <div class="detail-grid">
         <div>

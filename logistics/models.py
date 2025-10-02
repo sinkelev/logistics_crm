@@ -64,11 +64,3 @@ class RouteCargo(models.Model):
 
     def __str__(self):
         return f"{self.route} — {self.cargo} (#{self.position})"
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        cargo = self.cargo
-        driver_id = self.route.driver_id
-        if cargo.driver_id != driver_id:
-            cargo.driver_id = driver_id
-            cargo.save(update_fields=["driver"])

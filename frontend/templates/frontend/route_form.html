@@ -1,9 +1,22 @@
 {% extends "frontend/base.html" %}
-{% block title %}Новый рейс{% endblock %}
+{% load static %}
+
+{% block title %}
+  {% if object.pk %}Редактирование рейса{% else %}Создание рейса{% endif %}
+{% endblock %}
+
 {% block content %}
 <section class="form-page">
-    <h1>Создание рейса</h1>
-    <form method="post">
+    <h1>
+        {% if object.pk %}
+          Редактирование рейса {{ object.route_number }}
+        {% else %}
+          Создание рейса
+        {% endif %}
+    </h1>
+    <form method="post"
+          data-drivers-map='{{ drivers_map_json|safe }}'
+          data-vehicles-map='{{ vehicles_map_json|safe }}'>
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form %}
@@ -14,7 +27,16 @@
                 {{ field.errors }}
             </div>
         {% endfor %}
-        <button type="submit">Сохранить</button>
+        <div class="form-actions">
+          <button type="submit" class="button">Сохранить</button>
+          <a href="{{ request.META.HTTP_REFERER|default:'{% url "frontend:routes_list" %}' }}" class="button cancel">
+            Назад
+          </a>
+        </div>
     </form>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'frontend/route_form_autofill.js' %}"></script>
 {% endblock %}
