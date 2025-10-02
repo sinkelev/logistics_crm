@@ -46,28 +46,6 @@ class Route(models.Model):
     def __str__(self):
         return self.route_number
 
-    def save(self, *args, **kwargs):
-        driver_changed = False
-        if self.pk is not None:
-            previous_driver_id = (
-                Route.objects.filter(pk=self.pk)
-                .values_list("driver_id", flat=True)
-                .first()
-            )
-            driver_changed = previous_driver_id != self.driver_id
-        else:
-            driver_changed = self.driver_id is not None
-
-        super().save(*args, **kwargs)
-
-        if driver_changed:
-            self.sync_cargo_driver()
-
-    def sync_cargo_driver(self):
-        cargo_qs = self.cargoes.all()
-        if cargo_qs.exists():
-            cargo_qs.update(driver_id=self.driver_id)
-
 
 class RouteCargo(models.Model):
     route = models.ForeignKey(

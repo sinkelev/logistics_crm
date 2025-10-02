@@ -105,7 +105,7 @@ class OrderListView(LoginRequiredMixin, ListView):
         return (
             super()
             .get_queryset()
-            .select_related("driver", "document_driver")
+            .select_related("driver", "actual_vehicle")
         )
 
 
@@ -118,7 +118,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return (
             super()
             .get_queryset()
-            .select_related("driver", "document_driver")
+            .select_related("driver", "actual_vehicle")
         )
 
 

@@ -37,6 +37,13 @@
                 <dt>Водитель по документам</dt><dd>{{ order.document_driver|default:"—" }}</dd>
             </dl>
         </div>
+        <div>
+            <h2>Транспорт</h2>
+            <dl>
+                <dt>Машина по факту</dt><dd>{{ order.actual_vehicle|default:"—" }}</dd>
+                <dt>Машина по документам</dt><dd>{{ order.document_vehicle|default:"—" }}</dd>
+            </dl>
+        </div>
     </div>
 </section>
 {% endblock %}

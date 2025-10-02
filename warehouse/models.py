@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from vehicles.models import Vehicle
 
 class Order(models.Model):
     VAT_STATUS = [
@@ -47,14 +48,10 @@ class Order(models.Model):
         verbose_name="Водитель",
         related_name="assigned_orders"
     )
-    document_driver = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
+    document_driver = models.CharField(
+        max_length=255,
         blank=True,
-        limit_choices_to={"role": "driver"},
-        verbose_name="Водитель по документам",
-        related_name="documented_orders"
+        verbose_name="Водитель по документам"
     )
     route_from = models.CharField(max_length=255, verbose_name="Маршрут От")
     route_to = models.CharField(max_length=255, verbose_name="Маршрут До")
@@ -95,6 +92,19 @@ class Order(models.Model):
         default='not_sent',
         verbose_name="Статус РПО"
     )
+    actual_vehicle = models.ForeignKey(
+        Vehicle,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Машина по факту",
+        related_name="assigned_orders"
+    )
+    document_vehicle = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Машина по документам"
+    )
 
     def save(self, *args, **kwargs):
         # Автоматическая установка даты счёта
@@ -106,13 +116,12 @@ class Order(models.Model):
             self.date_invoice_act = self.date_act
 
         # Автоматически устанавливаем документального водителя только при создании
-        if not self.pk and self.driver:
-            self.document_driver = self.driver
+        if not self.pk and not self.document_driver and self.driver:
+            self.document_driver = self.driver.get_full_name() or self.driver.username
 
         # Для существующих записей запрещаем автоматическое изменение
-        elif self.pk:
-            original = Order.objects.get(pk=self.pk)
-            self.document_driver = original.document_driver
+        if not self.pk and not self.document_vehicle and self.actual_vehicle:
+            self.document_vehicle = str(self.actual_vehicle)
 
         super().save(*args, **kwargs)
 

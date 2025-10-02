@@ -17,7 +17,9 @@
                         <th>Заказчик</th>
                         <th>Маршрут</th>
                         <th>Водитель</th>
+                        <th>Машина (факт)</th>
                         <th>Док. водитель</th>
+                        <th>Машина (док)</th>
                         <th>Ставка</th>
                         <th>Счёт</th>
                         <th>Акт</th>
@@ -37,7 +39,9 @@
                             <td>{{ order.customer|truncatechars:20 }}</td>
                             <td>{{ order.route_from }} → {{ order.route_to }}</td>
                             <td>{{ order.driver|default:"—" }}</td>
+                            <td>{{ order.actual_vehicle|default:"—" }}</td>
                             <td>{{ order.document_driver|default:"—" }}</td>
+                            <td>{{ order.document_vehicle|default:"—" }}</td>
                             <td>
                                 {% if order.rate %}
                                     {{ order.rate }} ₽
