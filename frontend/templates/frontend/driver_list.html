@@ -1,0 +1,30 @@
+{% extends "frontend/base.html" %}
+{% block title %}Водители{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <h1>Водители</h1>
+  <p><a class="button" href="{% url 'accounts:driver_create' %}">Добавить водителя</a></p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ФИО</th>
+        <th>Телефон</th>
+        <th>Дата рождения</th>
+        <th>Принят</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in drivers %}
+        <tr>
+          <td><a href="{% url 'accounts:driver_detail' d.pk %}">{{ d.last_name }} {{ d.first_name }} {{ d.patronymic }}</a></td>
+          <td>{{ d.phone_main }}</td>
+          <td>{{ d.birth_date|date:"d.m.Y" }}</td>
+          <td>{{ d.hired_at|date:"d.m.Y" }}</td>
+          <td><a href="{% url 'accounts:driver_edit' d.pk %}">✏️</a></td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

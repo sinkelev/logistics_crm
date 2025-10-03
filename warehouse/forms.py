@@ -5,7 +5,9 @@ from vehicles.models import Vehicle
 
 User = get_user_model()
 
+
 class DatalistInput(forms.TextInput):
+    """Кастомный input с поддержкой HTML5 <datalist>"""
     template_name = 'warehouse/widgets/datalist.html'
 
     def __init__(self, attrs=None, datalist=None):
@@ -15,9 +17,9 @@ class DatalistInput(forms.TextInput):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         context['widget']['datalist'] = self.datalist
-        # Добавляем ID для datalist, чтобы связать его с input
         context['widget']['attrs']['list'] = f'datalist_{name}'
         return context
+
 
 class OrderForm(forms.ModelForm):
     driver = forms.ModelChoiceField(
@@ -69,20 +71,10 @@ class OrderForm(forms.ModelForm):
                 attrs={'class': 'form-control', 'placeholder': 'Имя заказчика или название компании'}),
             'route_from': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Пункт отправления'}),
             'route_to': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Пункт назначения'}),
-            'document_driver': DatalistInput(
-                attrs={'class': 'form-control', 'placeholder': 'Выберите или введите ФИО'},
-                # Получаем список ФИО всех водителей
-                datalist=[u.get_full_name() or u.username for u in User.objects.filter(role='driver').order_by('last_name')]
-            ),
-            'document_vehicle': DatalistInput(
-                attrs={'class': 'form-control', 'placeholder': 'Выберите или введите гос. номер'},
-                datalist=[str(v) for v in Vehicle.objects.all()]
-            ),
             'vat_status': forms.Select(attrs={'class': 'form-control'}),
             'is_return_trip': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'invoice_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер счета'}),
-            'act_number': forms.TextInput(
-                attrs={'class': 'form-control', 'placeholder': 'Номер акта выполненных работ'}),
+            'act_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер акта выполненных работ'}),
             'invoice_act_number': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер счет-фактуры'}),
             'date_order': forms.DateInput(attrs={'type': 'date'}),
             'date_invoice': forms.DateInput(attrs={'type': 'date'}),
@@ -94,8 +86,34 @@ class OrderForm(forms.ModelForm):
         initial_invoice_number = kwargs.pop('initial_invoice_number', None)
         super().__init__(*args, **kwargs)
 
-        # Если передано начальное значение, устанавливаем его для поля
         if initial_invoice_number:
             self.fields['invoice_number'].initial = initial_invoice_number
-            # Делаем поле "Машина по факту" только для чтения
-        #self.fields['actual_vehicle'].widget.attrs['disabled'] = True
+
+        # Загружаем варианты для datalist динамически здесь, а не в Meta (чтобы не рушить миграции)
+        try:
+            drivers = User.objects.filter(role='driver').order_by('last_name')
+            driver_names = []
+            for d in drivers:
+                if hasattr(d, 'get_full_name_with_middle'):
+                    driver_names.append(d.get_full_name_with_middle())
+                else:
+                    driver_names.append(d.get_full_name() or d.username)
+
+            self.fields['document_driver'].widget = DatalistInput(
+                attrs={'class': 'form-control', 'placeholder': 'Выберите или введите ФИО'},
+                datalist=driver_names
+            )
+
+            vehicles = Vehicle.objects.all()
+            self.fields['document_vehicle'].widget = DatalistInput(
+                attrs={'class': 'form-control', 'placeholder': 'Выберите или введите гос. номер'},
+                datalist=[str(v) for v in vehicles]
+            )
+        except Exception:
+            # если база недоступна (например, миграции) — используем обычные TextInput
+            self.fields['document_driver'].widget = forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Введите ФИО водителя'}
+            )
+            self.fields['document_vehicle'].widget = forms.TextInput(
+                attrs={'class': 'form-control', 'placeholder': 'Введите гос. номер'}
+            )

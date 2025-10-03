@@ -14,7 +14,7 @@
             <a href="{% url 'frontend:dashboard' %}">Дашборд</a>
             <a href="{% url 'frontend:orders_list' %}">Заявки</a>
             <a href="{% url 'frontend:routes_list' %}">Рейсы</a>
-            <a href="{% url 'frontend:add_driver' %}">Новый водитель</a>
+            <a href="{% url 'accounts:driver_list' %}">Водители</a>
             <a href="{% url 'logout' %}">Выход</a>
         </nav>
     {% endif %}

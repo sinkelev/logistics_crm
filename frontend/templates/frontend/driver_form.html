@@ -1,18 +1,26 @@
 {% extends "frontend/base.html" %}
-{% block title %}Новый водитель{% endblock %}
+{% block title %}{% if object.pk %}Редактирование водителя{% else %}Новый водитель{% endif %}{% endblock %}
 {% block content %}
 <section class="form-page">
-    <h1>Добавление водителя</h1>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-row">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {{ field.errors }}
-            </div>
-        {% endfor %}
-        <button type="submit">Создать</button>
-    </form>
+  <h1>{% if object.pk %}Редактирование{% else %}Новый водитель{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+      <div class="form-row">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+    <div class="form-actions">
+          <button type="submit" class="button">Сохранить</button>
+          {% if view.object %}
+            <a href="{% url 'accounts:driver_detail' view.object.pk %}" class="button cancel">Назад</a>
+          {% else %}
+              <a href="{% url 'accounts:driver_list' %}" class="button cancel">Назад</a>
+          {% endif %}
+        </div>
+  </form>
 </section>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ driver.last_name }} {{ driver.first_name }}{% endblock %}
+{% block content %}
+<section class="dashboard">
+  <h1>{{ driver.last_name }} {{ driver.first_name }} {{ driver.patronymic }}</h1>
+
+  <p><a class="button" href="{% url 'accounts:driver_edit' driver.pk %}">Редактировать</a>
+     <a class="button" href="{% url 'accounts:driver_list' %}">Назад</a></p>
+
+  <dl>
+    <dt>Дата рождения</dt><dd>{{ driver.birth_date|default:"—" }}</dd>
+    <dt>Телефон</dt><dd>{{ driver.phone_main }} (раб: {{ driver.phone_work }})</dd>
+    <dt>Паспорт</dt><dd>{{ driver.passport_number }} ({{ driver.passport_issued_by }}, {{ driver.passport_issued_at }})</dd>
+    <dt>СНИЛС</dt><dd>{{ driver.snils }}</dd>
+    <dt>ИНН</dt><dd>{{ driver.inn }}</dd>
+    <dt>Дата трудоустройства</dt><dd>{{ driver.hired_at|default:"—" }}</dd>
+    <dt>Дата увольнения</dt><dd>{{ driver.fired_at|default:"—" }}</dd>
+  </dl>
+</section>
+{% endblock %}
