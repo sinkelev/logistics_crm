@@ -2,11 +2,7 @@
 {% block content %}
 <section class="form-page">
     <h1>
-        {% if object.pk %}
-            Редактирование ТС {{ object.plate_number }}
-        {% else %}
-            Добавление нового ТС
-        {% endif %}
+        {{ form_title }}
     </h1>
 
     <form method="post">
@@ -30,7 +26,13 @@
 
         <div class="form-actions">
             <button type="submit" class="button">Сохранить</button>
-            <a href="{% url 'frontend:vehicle_car_list' %}" class="button cancel">Назад к автомобилям</a>
+            {% if object %}
+                <a href="{% url 'frontend:vehicle_detail' object.pk %}" class="button cancel">Отмена</a>
+            {% elif 'trailer' in request.path %}
+                 <a href="{% url 'frontend:vehicle_trailer_list' %}" class="button cancel">Отмена</a>
+            {% else %}
+                 <a href="{% url 'frontend:vehicle_car_list' %}" class="button cancel">Отмена</a>
+            {% endif %}
         </div>
     </form>
 </section>

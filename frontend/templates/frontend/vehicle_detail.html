@@ -26,19 +26,23 @@
             <dl>
                 <dt>Статус</dt><dd>{{ vehicle.get_status_display }}</dd>
                 <dt>Последнее ТО</dt><dd>{{ vehicle.last_service_at|date:"d.m.Y"|default:"—" }}</dd>
-                <dt>Тип ТС</dt><dd>
+                <dt>Тип ТС</dt>
+                <dd>
                     {% if vehicle.is_collector %}Полуприцеп/Прицеп{% else %}Автомобиль{% endif %}
                 </dd>
-                
+
                 {% if vehicle.is_collector and vehicle.hitched_to %}
-                    <dt>Привязан к</dt><dd><a href="{% url 'frontend:vehicle_detail' vehicle.hitched_to.pk %}">{{ vehicle.hitched_to }}</a></dd>
-                {% elif not vehicle.is_collector and vehicle.trailers.exists %}
-                    <dt>Привязанные прицепы</dt>
+                    <dt>Привязан к</dt>
+                    <dd><a href="{% url 'frontend:vehicle_detail' vehicle.hitched_to.pk %}">{{ vehicle.hitched_to }}</a></dd>
+                {% endif %}
+
+                {% if not vehicle.is_collector and vehicle.trailers.all %}
+                    <dt>Прицеплен</dt>
                     <dd>
                         <ul>
-                            {% for trailer in vehicle.trailers.all %}
-                                <li><a href="{% url 'frontend:vehicle_detail' trailer.pk %}">{{ trailer }}</a></li>
-                            {% endfor %}
+                        {% for trailer in vehicle.trailers.all %}
+                            <li><a href="{% url 'frontend:vehicle_detail' trailer.pk %}">{{ trailer }}</a></li>
+                        {% endfor %}
                         </ul>
                     </dd>
                 {% endif %}

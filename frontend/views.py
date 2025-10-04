@@ -3,7 +3,7 @@ import json
 
 from urllib.parse import urlencode
 from vehicles.models import Vehicle
-from vehicles.forms import VehicleForm
+from vehicles.forms import VehicleForm, TrailerForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
@@ -274,11 +274,27 @@ class VehicleDetailView(LoginRequiredMixin, DetailView):
     template_name = "frontend/vehicle_detail.html"
     context_object_name = "vehicle"
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('trailers')
+
 
 class VehicleUpdateView(LoginRequiredMixin, UpdateView):
     model = Vehicle
-    form_class = VehicleForm
     template_name = "frontend/vehicle_form.html"
+
+    def get_form_class(self):
+        # В зависимости от типа ТС, возвращаем нужную форму
+        if self.object.is_collector:
+            return TrailerForm
+        return VehicleForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.is_collector:
+            context['form_title'] = f"Редактирование полуприцепа {self.object.plate_number}"
+        else:
+            context['form_title'] = f"Редактирование автомобиля {self.object.plate_number}"
+        return context
 
     def get_success_url(self):
         return reverse("frontend:vehicle_detail", kwargs={"pk": self.object.pk})
@@ -286,6 +302,22 @@ class VehicleUpdateView(LoginRequiredMixin, UpdateView):
 
 class VehicleCreateView(LoginRequiredMixin, CreateView):
     model = Vehicle
-    form_class = VehicleForm
+    form_class = VehicleForm  # Используем форму для автомобилей
     template_name = "frontend/vehicle_form.html"
     success_url = reverse_lazy("frontend:vehicle_car_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_title'] = "Добавление нового автомобиля"
+        return context
+
+class TrailerCreateView(LoginRequiredMixin, CreateView):
+    model = Vehicle
+    form_class = TrailerForm
+    template_name = "frontend/vehicle_form.html"
+    success_url = reverse_lazy("frontend:vehicle_trailer_list")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_title'] = "Добавление нового полуприцепа"
+        return context

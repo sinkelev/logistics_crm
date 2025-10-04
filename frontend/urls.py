@@ -17,7 +17,8 @@ urlpatterns = [
     path("routes/<int:pk>/edit/", views.RouteUpdateView.as_view(), name="route_edit"),
     path("vehicles/cars/", views.VehicleListView.as_view(vehicle_type='cars'), name="vehicle_car_list"),
     path("vehicles/trailers/", views.VehicleListView.as_view(vehicle_type='trailers'), name="vehicle_trailer_list"),
-    path("vehicles/new/", views.VehicleCreateView.as_view(), name="vehicle_create"),
+    path("vehicles/cars/new/", views.VehicleCreateView.as_view(), name="vehicle_create"),  # Для машин
+    path("vehicles/trailers/new/", views.TrailerCreateView.as_view(), name="trailer_create"),
     path("vehicles/<int:pk>/", views.VehicleDetailView.as_view(), name="vehicle_detail"),
     path("vehicles/<int:pk>/edit/", views.VehicleUpdateView.as_view(), name="vehicle_edit"),
     path("accounts/", include("accounts.urls")),

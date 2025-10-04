@@ -12,9 +12,11 @@
     </h1>
 
     <p>
-        <a class="button" href="{% url 'frontend:vehicle_create' %}{% if vehicle_type %}?is_collector={% if vehicle_type == 'trailers' %}true{% else %}false{% endif %}{% endif %}">
-            Добавить
-        </a>
+    {% if vehicle_type == 'cars' %}
+        <a class="button" href="{% url 'frontend:vehicle_create' %}">Добавить автомобиль</a>
+    {% elif vehicle_type == 'trailers' %}
+        <a class="button" href="{% url 'frontend:trailer_create' %}">Добавить полуприцеп</a>
+    {% endif %}
     </p>
 
     {% if vehicles %}
@@ -23,28 +25,42 @@
                 <tr>
                     <th>Госномер</th>
                     <th>Марка</th>
-                    <th>Модель</th>
                     <th>Статус</th>
-                    {% if vehicle_type == 'trailers' %}<th>Авто</th>{% endif %}
+                    <!-- Меняем заголовок в зависимости от типа -->
+                    {% if vehicle_type == 'trailers' %}
+                        <th>Привязан к</th>
+                    {% else %}
+                        <th>Прицеп</th>
+                    {% endif %}
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 {% for vehicle in vehicles %}
                     <tr>
-                        <td>
-                            <a href="{% url 'frontend:vehicle_detail' vehicle.pk %}">
-                                {{ vehicle.plate_number }}
-                            </a>
-                        </td>
+                        <td><a href="{% url 'frontend:vehicle_detail' vehicle.pk %}">{{ vehicle.plate_number }}</a></td>
                         <td>{{ vehicle.brand }}</td>
-                        <td>{{ vehicle.model }}</td>
                         <td>{{ vehicle.get_status_display }}</td>
-                        
-                        {% if vehicle_type == 'trailers' and vehicle.hitched_to %}
-                            <td>{{ vehicle.hitched_to.plate_number }}</td>
-                        {% endif %}
-                        
+
+                        <td>
+                            {% if vehicle.is_collector %}
+                                {% if vehicle.hitched_to %}
+                                    {{ vehicle.hitched_to.plate_number }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            {% else %}
+                                <!-- Выводим первый прицепленный, если он есть -->
+                                {% with vehicle.trailers.first as trailer %}
+                                    {% if trailer %}
+                                        {{ trailer.plate_number }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+
                         <td class="actions">
                             <a href="{% url 'frontend:vehicle_edit' vehicle.pk %}" class="link-edit">✏️</a>
                         </td>
@@ -56,9 +72,9 @@
     {% else %}
         <p>
             {% if vehicle_type == 'cars' %}
-                Автомобилей пока нет
+                <a class="button" href="{% url 'frontend:vehicle_create' %}">Добавить автомобиль</a>
             {% elif vehicle_type == 'trailers' %}
-                Полуприцепов пока нет
+                <a class="button" href="{% url 'frontend:trailer_create' %}">Добавить полуприцеп</a>
             {% endif %}
         </p>
     {% endif %}
