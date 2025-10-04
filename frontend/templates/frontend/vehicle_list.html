@@ -1,0 +1,66 @@
+{% extends "frontend/base.html" %}
+{% block content %}
+<section class="dashboard">
+    <h1>
+        {% if vehicle_type == 'cars' %}
+            Список автомобилей
+        {% elif vehicle_type == 'trailers' %}
+            Список полуприцепов
+        {% else %}
+            Транспортные средства
+        {% endif %}
+    </h1>
+
+    <p>
+        <a class="button" href="{% url 'frontend:vehicle_create' %}{% if vehicle_type %}?is_collector={% if vehicle_type == 'trailers' %}true{% else %}false{% endif %}{% endif %}">
+            Добавить
+        </a>
+    </p>
+
+    {% if vehicles %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Госномер</th>
+                    <th>Марка</th>
+                    <th>Модель</th>
+                    <th>Статус</th>
+                    {% if vehicle_type == 'trailers' %}<th>Авто</th>{% endif %}
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehicle in vehicles %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'frontend:vehicle_detail' vehicle.pk %}">
+                                {{ vehicle.plate_number }}
+                            </a>
+                        </td>
+                        <td>{{ vehicle.brand }}</td>
+                        <td>{{ vehicle.model }}</td>
+                        <td>{{ vehicle.get_status_display }}</td>
+                        
+                        {% if vehicle_type == 'trailers' and vehicle.hitched_to %}
+                            <td>{{ vehicle.hitched_to.plate_number }}</td>
+                        {% endif %}
+                        
+                        <td class="actions">
+                            <a href="{% url 'frontend:vehicle_edit' vehicle.pk %}" class="link-edit">✏️</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% include "frontend/pagination.html" %}
+    {% else %}
+        <p>
+            {% if vehicle_type == 'cars' %}
+                Автомобилей пока нет
+            {% elif vehicle_type == 'trailers' %}
+                Полуприцепов пока нет
+            {% endif %}
+        </p>
+    {% endif %}
+</section>
+{% endblock %}

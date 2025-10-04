@@ -3,12 +3,11 @@ import json
 
 from urllib.parse import urlencode
 from vehicles.models import Vehicle
-from django.db import models
-from django.db.models.functions import Length, Right, Cast
+from vehicles.forms import VehicleForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy, reverse
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.views import View
 from django.views.generic import (
     TemplateView,
@@ -247,3 +246,46 @@ class OrderCopyView(LoginRequiredMixin, View):
         return HttpResponseRedirect(redirect_url)
 
         return HttpResponseRedirect(redirect_url)
+
+
+class VehicleListView(LoginRequiredMixin, ListView):
+    model = Vehicle
+    template_name = "frontend/vehicle_list.html"
+    context_object_name = "vehicles"
+    paginate_by = 20
+    vehicle_type = None
+
+    def get_queryset(self):
+        if self.vehicle_type == 'cars':
+            return self.model.objects.filter(is_collector=False)
+        elif self.vehicle_type == 'trailers':
+            return self.model.objects.filter(is_collector=True)
+        else:
+            raise Http404("Неверный тип транспорта")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vehicle_type'] = self.vehicle_type  # Передаём в шаблон
+        return context
+
+
+class VehicleDetailView(LoginRequiredMixin, DetailView):
+    model = Vehicle
+    template_name = "frontend/vehicle_detail.html"
+    context_object_name = "vehicle"
+
+
+class VehicleUpdateView(LoginRequiredMixin, UpdateView):
+    model = Vehicle
+    form_class = VehicleForm
+    template_name = "frontend/vehicle_form.html"
+
+    def get_success_url(self):
+        return reverse("frontend:vehicle_detail", kwargs={"pk": self.object.pk})
+
+
+class VehicleCreateView(LoginRequiredMixin, CreateView):
+    model = Vehicle
+    form_class = VehicleForm
+    template_name = "frontend/vehicle_form.html"
+    success_url = reverse_lazy("frontend:vehicle_car_list")

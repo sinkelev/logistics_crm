@@ -1,0 +1,49 @@
+{% extends "frontend/base.html" %}
+{% block content %}
+<section class="dashboard">
+    <h1>{{ vehicle.plate_number }} — {{ vehicle.brand }} {{ vehicle.model }}</h1>
+    
+    <p>
+        <a href="{% url 'frontend:vehicle_edit' vehicle.pk %}" class="button">Редактировать</a>
+        <a href="{% if vehicle.is_collector %}{% url 'frontend:vehicle_trailer_list' %}{% else %}{% url 'frontend:vehicle_car_list' %}{% endif %}" class="button cancel">Назад</a>
+    </p>
+
+    <div class="detail-grid">
+        <div>
+            <h2>Основная информация</h2>
+            <dl>
+                <dt>Госномер</dt><dd>{{ vehicle.plate_number }}</dd>
+                <dt>ВИН</dt><dd>{{ vehicle.vin|default:"—" }}</dd>
+                <dt>Марка/Модель</dt><dd>{{ vehicle.brand }} {{ vehicle.model }}</dd>
+                <dt>Год выпуска</dt><dd>{{ vehicle.year|default:"—" }}</dd>
+                <dt>Пробег</dt><dd>{{ vehicle.mileage }} км</dd>
+                <dt>Грузоподъемность</dt><dd>{{ vehicle.payload_capacity_kg|default:"—" }} кг</dd>
+            </dl>
+        </div>
+
+        <div>
+            <h2>Текущий статус</h2>
+            <dl>
+                <dt>Статус</dt><dd>{{ vehicle.get_status_display }}</dd>
+                <dt>Последнее ТО</dt><dd>{{ vehicle.last_service_at|date:"d.m.Y"|default:"—" }}</dd>
+                <dt>Тип ТС</dt><dd>
+                    {% if vehicle.is_collector %}Полуприцеп/Прицеп{% else %}Автомобиль{% endif %}
+                </dd>
+                
+                {% if vehicle.is_collector and vehicle.hitched_to %}
+                    <dt>Привязан к</dt><dd><a href="{% url 'frontend:vehicle_detail' vehicle.hitched_to.pk %}">{{ vehicle.hitched_to }}</a></dd>
+                {% elif not vehicle.is_collector and vehicle.trailers.exists %}
+                    <dt>Привязанные прицепы</dt>
+                    <dd>
+                        <ul>
+                            {% for trailer in vehicle.trailers.all %}
+                                <li><a href="{% url 'frontend:vehicle_detail' trailer.pk %}">{{ trailer }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </dd>
+                {% endif %}
+            </dl>
+        </div>
+    </div>
+</section>
+{% endblock %}

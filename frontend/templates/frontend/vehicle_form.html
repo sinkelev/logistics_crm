@@ -1,0 +1,37 @@
+{% extends "frontend/base.html" %}
+{% block content %}
+<section class="form-page">
+    <h1>
+        {% if object.pk %}
+            Редактирование ТС {{ object.plate_number }}
+        {% else %}
+            Добавление нового ТС
+        {% endif %}
+    </h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="form-grid">
+            {% for field in form %}
+                {% if not field.is_hidden %}
+                    <div class="form-row">
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                        {{ field.errors }}
+                    </div>
+                {% else %}
+                    {{ field }}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button">Сохранить</button>
+            <a href="{% url 'frontend:vehicle_car_list' %}" class="button cancel">Назад к автомобилям</a>
+        </div>
+    </form>
+</section>
+{% endblock %}
