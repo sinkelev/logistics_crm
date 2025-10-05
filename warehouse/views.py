@@ -1,11 +1,11 @@
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET
+from django.contrib.auth.decorators import login_required
 from .services import check_delivery_status
 
 
 @require_GET
-@csrf_exempt
+@login_required
 def check_delivery_api(request):
     tracking_number = request.GET.get('tracking_number')
     if not tracking_number:
@@ -15,7 +15,13 @@ def check_delivery_api(request):
         }, status=400)
 
     try:
-        delivery_date = check_delivery_status(tracking_number)
+        delivery_date, debug_info = check_delivery_status(tracking_number)
+
+        if debug_info:
+            return JsonResponse({
+                'success': False,
+                'error': debug_info
+            })
 
         if delivery_date:
             return JsonResponse({
@@ -35,5 +41,5 @@ def check_delivery_api(request):
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'error': f'Ошибка сервера'
+            'error': f'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)

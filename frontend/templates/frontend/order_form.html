@@ -20,31 +20,18 @@
     {{ form.non_field_errors }}
 
     {% for field in form %}
-      {% if field.name != 'rpo_number' and field.name != 'delivery_date' %}
-        <div class="form-row">
-          <label>{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-          {{ field.errors }}
-        </div>
-      {% endif %}
+      <div class="form-row">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {% if field.name == 'rpo_number' %}
+          <button type="button" id="check-delivery" class="button" style="margin-top: 5px; background: #6b7280;">
+              Проверить доставку
+          </button>
+        {% endif %}
+        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+        {{ field.errors }}
+      </div>
     {% endfor %}
-
-    <!-- Поля для РПО выносим отдельно -->
-    <div class="form-row">
-        <label>{{ form.rpo_number.label }}</label>
-        {{ form.rpo_number }}
-        <button type="button" id="check-delivery" class="button secondary" style="margin-top: 5px;">
-            Проверить доставку
-        </button>
-        {{ form.rpo_number.errors }}
-    </div>
-
-    <div class="form-row">
-        <label>{{ form.delivery_date.label }}</label>
-        {{ form.delivery_date }}
-        {{ form.delivery_date.errors }}
-    </div>
 
     <div class="form-actions">
       <button type="submit" class="button">Сохранить</button>
@@ -57,5 +44,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'frontend/order_form.js' %}"></script>
+  {# Используем ваш файл order_form.js, он корректный #}
+  <script src="{% static 'frontend/order_form.js' %}"></script>
 {% endblock %}

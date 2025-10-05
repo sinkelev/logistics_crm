@@ -58,6 +58,7 @@ class OrderForm(forms.ModelForm):
             'date_invoice_act',
             'rpo_number',
             'rpo_status',
+            'delivery_date',
         ]
         widgets = {
             'code': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Уникальный складской номер'}),
@@ -81,6 +82,7 @@ class OrderForm(forms.ModelForm):
             'date_invoice': forms.DateInput(attrs={'type': 'date'}),
             'date_act': forms.DateInput(attrs={'type': 'date'}),
             'date_invoice_act': forms.DateInput(attrs={'type': 'date'}),
+            'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'readonly': True}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -121,14 +123,6 @@ class OrderForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-
-        # Проверяем доставку при изменении номера РПО
-        if (instance.rpo_number and
-                instance.rpo_number != self.initial.get('rpo_number')):
-
-            delivery_date = check_delivery_status(instance.rpo_number)
-            if delivery_date:
-                instance.delivery_date = delivery_date
 
         if commit:
             instance.save()
