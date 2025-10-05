@@ -1,4 +1,5 @@
 {% extends "frontend/base.html" %}
+{% load static %}
 
 {% block title %}
   {% if object.pk %}Редактирование заявки{% else %}Добавление заявки{% endif %}
@@ -19,13 +20,31 @@
     {{ form.non_field_errors }}
 
     {% for field in form %}
-      <div class="form-row">
-        <label>{{ field.label }}</label>
-        {{ field }}
-        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
-        {{ field.errors }}
-      </div>
+      {% if field.name != 'rpo_number' and field.name != 'delivery_date' %}
+        <div class="form-row">
+          <label>{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+          {{ field.errors }}
+        </div>
+      {% endif %}
     {% endfor %}
+
+    <!-- Поля для РПО выносим отдельно -->
+    <div class="form-row">
+        <label>{{ form.rpo_number.label }}</label>
+        {{ form.rpo_number }}
+        <button type="button" id="check-delivery" class="button secondary" style="margin-top: 5px;">
+            Проверить доставку
+        </button>
+        {{ form.rpo_number.errors }}
+    </div>
+
+    <div class="form-row">
+        <label>{{ form.delivery_date.label }}</label>
+        {{ form.delivery_date }}
+        {{ form.delivery_date.errors }}
+    </div>
 
     <div class="form-actions">
       <button type="submit" class="button">Сохранить</button>
@@ -35,4 +54,8 @@
     </div>
   </form>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'frontend/order_form.js' %}"></script>
 {% endblock %}

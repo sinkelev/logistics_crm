@@ -2,6 +2,7 @@ from django import forms
 from .models import Order
 from django.contrib.auth import get_user_model
 from vehicles.models import Vehicle
+from .services import check_delivery_status
 
 User = get_user_model()
 
@@ -117,3 +118,18 @@ class OrderForm(forms.ModelForm):
             self.fields['document_vehicle'].widget = forms.TextInput(
                 attrs={'class': 'form-control', 'placeholder': 'Введите гос. номер'}
             )
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Проверяем доставку при изменении номера РПО
+        if (instance.rpo_number and
+                instance.rpo_number != self.initial.get('rpo_number')):
+
+            delivery_date = check_delivery_status(instance.rpo_number)
+            if delivery_date:
+                instance.delivery_date = delivery_date
+
+        if commit:
+            instance.save()
+        return instance

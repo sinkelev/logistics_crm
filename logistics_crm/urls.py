@@ -21,6 +21,7 @@ from rest_framework.routers import DefaultRouter
 from logistics.api import RouteViewSet
 from warehouse.api import OrderViewSet
 from finance.api import ExpenseViewSet
+from warehouse.views import check_delivery_api
 
 router = DefaultRouter()
 router.register(r"routes", RouteViewSet)
@@ -32,6 +33,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("accounts/login/", auth_views.LoginView.as_view(template_name="frontend/login.html"), name="login"),
     path("accounts/logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
+    path('api/check-delivery/', check_delivery_api, name='check_delivery'),
     path("", include("frontend.urls")),
     path("", include("accounts.urls")),
 ]

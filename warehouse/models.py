@@ -105,6 +105,11 @@ class Order(models.Model):
         blank=True,
         verbose_name="Машина по документам"
     )
+    delivery_date = models.DateField(
+        verbose_name="Дата доставки",
+        blank=True,
+        null=True
+    )
 
     def save(self, *args, **kwargs):
         # Автоматическая установка даты счёта
