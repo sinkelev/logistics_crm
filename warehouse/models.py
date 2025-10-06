@@ -106,6 +106,11 @@ class Order(models.Model):
         blank=True,
         verbose_name="Машина по документам"
     )
+    shipping_date = models.DateField(
+        verbose_name="Дата отправки",
+        blank=True,
+        null=True
+    )
     delivery_date = models.DateField(
         verbose_name="Дата доставки",
         blank=True,

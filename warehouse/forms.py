@@ -58,6 +58,7 @@ class OrderForm(forms.ModelForm):
             'date_invoice_act',
             'rpo_number',
             'rpo_status',
+            'shipping_date',
             'delivery_date',
         ]
         widgets = {
@@ -82,6 +83,7 @@ class OrderForm(forms.ModelForm):
             'date_invoice': forms.DateInput(attrs={'type': 'date'}),
             'date_act': forms.DateInput(attrs={'type': 'date'}),
             'date_invoice_act': forms.DateInput(attrs={'type': 'date'}),
+            'shipping_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control', 'readonly': True}),
         }
 

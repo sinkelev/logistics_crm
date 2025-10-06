@@ -20,7 +20,7 @@ def check_delivery_api(request):
         }, status=400)
 
     try:
-        delivery_date, debug_info = check_delivery_status(tracking_number)
+        delivery_date, shipping_date, debug_info = check_delivery_status(tracking_number)
 
         if debug_info:
             return JsonResponse({
@@ -28,20 +28,24 @@ def check_delivery_api(request):
                 'error': debug_info
             })
 
+        response_data = {
+            'success': True,
+            'delivery_date': delivery_date.strftime('%Y-%m-%d') if delivery_date else None,
+            'shipping_date': shipping_date.strftime('%Y-%m-%d') if shipping_date else None,
+        }
+
+        messages = []
         if delivery_date:
-            return JsonResponse({
-                'success': True,
-                'status': 'delivered',
-                'delivery_date': delivery_date.strftime('%Y-%m-%d'),
-                'message': f'Доставлено {delivery_date.strftime("%d.%m.%Y")}'
-            })
-        else:
-            return JsonResponse({
-                'success': True,
-                'status': 'not_delivered',
-                'delivery_date': None,
-                'message': 'Доставка не найдена или отправление еще в пути'
-            })
+            messages.append(f'Доставлено {delivery_date.strftime("%d.%m.%Y")}')
+        if shipping_date:
+            messages.append(f'Отправлено {shipping_date.strftime("%d.%m.%Y")}')
+
+        if not messages:
+            messages.append('Информация о доставке/отправке не найдена')
+
+        response_data['message'] = '. '.join(messages)
+
+        return JsonResponse(response_data)
 
     except Exception as e:
         return JsonResponse({

@@ -66,10 +66,10 @@
                               {% endwith %}
                             </td>
                             <td>
-                              {% if rec and rec.shipping_date %}{{ rec.shipping_date }}{% else %}—{% endif %}
+                              {% if order.shipping_date %}{{ order.shipping_date }}{% else %}—{% endif %}
                             </td>
                             <td>
-                              {% if rec and rec.delivery_date %}{{ rec.delivery_date }}{% else %}—{% endif %}
+                              {% if order.delivery_date %}{{ order.delivery_date }}{% else %}—{% endif %}
                             </td>
                             <td class="actions">
                                 <a href="{% url 'frontend:order_edit' order.pk %}" class="link-edit" title="Редактировать">
