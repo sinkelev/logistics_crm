@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.conf import settings
 from vehicles.models import Vehicle
 
+
 class Order(models.Model):
     VAT_STATUS = [
         ("with_vat", "С НДС"),
@@ -162,3 +163,50 @@ class WarehouseEntry(models.Model):
     class Meta:
         verbose_name = "Складская запись"
         verbose_name_plural = "Складские записи"
+
+
+class PostalRecord(models.Model):
+    SERVICE_CHOICES = [
+        ("pochta", "Почта России"),
+        ("sdek", "СДЭК"),
+        ("unknown", "Неопределено"),
+    ]
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="postal_records",
+        verbose_name="Заявка"
+    )
+    rpo_number = models.CharField("Номер РПО", max_length=50, blank=True)
+    service = models.CharField("Служба", max_length=20, choices=SERVICE_CHOICES, default="unknown")
+    shipping_date = models.DateField("Дата отправки", blank=True, null=True)
+    delivery_date = models.DateField("Дата доставки", blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def detect_service(self):
+        """
+        Определяем службу по формату rpo_number:
+          - 14 цифр -> pochta
+          - 11 цифр -> sdek
+          Иначе unknown
+        """
+        num = self.rpo_number.strip()
+        if num.isdigit():
+            if len(num) == 14:
+                return "pochta"
+            elif len(num) == 11:
+                return "sdek"
+        return "unknown"
+
+    def save(self, *args, **kwargs):
+        # Если сервис не задан вручную, определим его на основе rpo_number
+        if self.service == "unknown" and self.rpo_number:
+            self.service = self.detect_service()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Отправление для {self.order.code} [{self.service}]"

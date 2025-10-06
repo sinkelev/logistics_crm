@@ -25,6 +25,9 @@
                         <th>Акт</th>
                         <th>Счет-фактура</th>
                         <th>Статус НДС</th>
+                        <th>RPO</th>
+                        <th>Дата отправки</th>
+                        <th>Дата доставки</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -53,6 +56,21 @@
                             <td>{{ order.act_number|default:"—" }}</td>
                             <td>{{ order.invoice_act_number|default:"—" }}</td>
                             <td>{{ order.get_vat_status_display }}</td>
+                            <td>
+                              {% with rec=order.postal_records.last %}
+                                {% if rec %}
+                                  {{ rec.rpo_number }} ({{ rec.get_service_display }})
+                                {% else %}
+                                  —
+                                {% endif %}
+                              {% endwith %}
+                            </td>
+                            <td>
+                              {% if rec and rec.shipping_date %}{{ rec.shipping_date }}{% else %}—{% endif %}
+                            </td>
+                            <td>
+                              {% if rec and rec.delivery_date %}{{ rec.delivery_date }}{% else %}—{% endif %}
+                            </td>
                             <td class="actions">
                                 <a href="{% url 'frontend:order_edit' order.pk %}" class="link-edit" title="Редактировать">
                                     ✏️

@@ -1,6 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import PostalRecord, Order
+from .forms import PostalRecordForm
 from .services import check_delivery_status
 
 
@@ -43,3 +48,38 @@ def check_delivery_api(request):
             'success': False,
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         }, status=500)
+
+
+class PostalRecordListView(LoginRequiredMixin, ListView):
+    template_name = "frontend/postal_list.html"
+    context_object_name = "orders"
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Order.objects.all().prefetch_related("postal_records").order_by("-date_order")
+
+class PostalRecordCreateView(LoginRequiredMixin, CreateView):
+    model = PostalRecord
+    form_class = PostalRecordForm
+    template_name = "frontend/postal_form.html"
+    success_url = reverse_lazy("warehouse:postal_list")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        order_id = self.request.GET.get("order")
+        if order_id:
+            initial["order"] = order_id
+        return initial
+
+class PostalRecordUpdateView(LoginRequiredMixin, UpdateView):
+    model = PostalRecord
+    form_class = PostalRecordForm
+    template_name = "frontend/postal_form.html"
+
+    def get_success_url(self):
+        return reverse_lazy("warehouse:postal_list")
+
+class PostalRecordDetailView(LoginRequiredMixin, DetailView):
+    model = PostalRecord
+    template_name = "frontend/postal_detail.html"
+    context_object_name = "postal"

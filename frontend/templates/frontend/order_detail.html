@@ -45,6 +45,22 @@
                 <dt>Машина по документам</dt><dd>{{ order.document_vehicle|default:"—" }}</dd>
             </dl>
         </div>
+        <div>
+            <h2>Почтовое отправление</h2>
+            {% if object.postal_records.exists %}
+                {% for rec in object.postal_records.all %}
+                    <p>RPO: {{ rec.rpo_number }} ({{ rec.get_service_display }})<br>
+                       Дата отправки: {{ rec.shipping_date|default:"—" }}<br>
+                       Дата доставки: {{ rec.delivery_date|default:"—" }}
+                    </p>
+                    <a href="{% url 'warehouse:postal_edit' rec.pk %}" class="button">Редактировать</a>
+                {% endfor %}
+                <p><a href="{% url 'warehouse:postal_create' %}?order={{ object.pk }}" class="button">Добавить ещё отправление</a></p>
+            {% else %}
+                <p>Почтовых отправлений нет</p>
+                <a href="{% url 'warehouse:postal_create' %}?order={{ object.pk }}" class="button">Добавить RPO</a>
+            {% endif %}
+        </div>
     </div>
 </section>
 {% endblock %}

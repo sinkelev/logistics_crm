@@ -1,0 +1,56 @@
+{% extends "frontend/base.html" %}
+{% block title %}Отправленные документы (РПО){% endblock %}
+{% block content %}
+<section class="dashboard">
+  <h1>Отправления (РПО)</h1>
+  <p>
+    <!-- Кнопка "добавить запись" без привязки к конкретному заказу -->
+    <a href="{% url 'warehouse:postal_create' %}" class="button">Добавить запись</a>
+  </p>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Складской номер</th>
+        <th>Заказчик</th>
+        <th>Номер РПО</th>
+        <th>Служба</th>
+        <th>Дата отправки</th>
+        <th>Дата доставки</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+        {% if order.postal_records.exists %}
+          {% for p in order.postal_records.all %}
+            <tr>
+              <td>{{ order.code }}</td>
+              <td>{{ order.customer }}</td>
+              <td>{{ p.rpo_number }}</td>
+              <td>{{ p.get_service_display }}</td>
+              <td>{{ p.shipping_date|default:"—" }}</td>
+              <td>{{ p.delivery_date|default:"—" }}</td>
+              <td>
+                <a href="{% url 'warehouse:postal_detail' p.pk %}">Просмотр</a> |
+                <a href="{% url 'warehouse:postal_edit' p.pk %}">Редактировать</a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <!-- Если у заказа нет записей -->
+          <tr>
+            <td>{{ order.code }}</td>
+            <td>{{ order.customer }}</td>
+            <td colspan="4">Нет записей</td>
+            <td>
+              <!-- Передаём параметр ?order=ID, чтобы форма сразу понимала, к какому заказу прикрепить RPO -->
+              <a href="{% url 'warehouse:postal_create' %}?order={{ order.pk }}" class="button">Добавить</a>
+            </td>
+          </tr>
+        {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

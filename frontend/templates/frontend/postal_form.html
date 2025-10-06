@@ -1,0 +1,24 @@
+{% extends "frontend/base.html" %}
+{% block title %}{{ postal.pk|yesno:"Редактирование,Создание"}} отправления{% endblock %}
+{% block content %}
+<section class="form-page">
+  <h1>{{ postal.pk|yesno:"Редактирование,Новое"}} отправление</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    {% for field in form %}
+      <div class="form-row">
+        <label>{{ field.label }}</label>
+        {{ field }}
+        {{ field.errors }}
+      </div>
+    {% endfor %}
+
+    <div class="form-actions">
+      <button type="submit" class="button">Сохранить</button>
+      <a href="{% url 'warehouse:postal_list' %}" class="button cancel">Отмена</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

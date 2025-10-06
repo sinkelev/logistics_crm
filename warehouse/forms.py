@@ -2,7 +2,7 @@ from django import forms
 from .models import Order
 from django.contrib.auth import get_user_model
 from vehicles.models import Vehicle
-from .services import check_delivery_status
+from .models import PostalRecord
 
 User = get_user_model()
 
@@ -127,3 +127,22 @@ class OrderForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
+
+
+class PostalRecordForm(forms.ModelForm):
+    class Meta:
+        model = PostalRecord
+        fields = [
+            "order",
+            "rpo_number",
+            "service",
+            "shipping_date",
+            "delivery_date",
+        ]
+        widgets = {
+            "order": forms.Select(attrs={"class": "form-control"}),
+            "rpo_number": forms.TextInput(attrs={"class": "form-control"}),
+            "service": forms.Select(attrs={"class": "form-control"}),
+            "shipping_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "delivery_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        }
